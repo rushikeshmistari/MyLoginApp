@@ -1,0 +1,9 @@
+# IDE settings and build output
+.classpath
+.project
+.settings/
+build/
+target/
+
+# Database credentials belong in a local configuration file only.
+db.properties
