@@ -1,4 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="org.apache.commons.text.StringEscapeUtils" %>
 <%
     String username = (String) session.getAttribute("username");
     if (username == null) {
@@ -22,7 +23,7 @@
 <body>
     <main class="card">
         <h1>Login Successful</h1>
-        <p>Welcome, <strong><%= username %></strong>!<br>You have been authenticated using JSP, Servlet, and JDBC.</p>
+        <p>Welcome, <strong><%= StringEscapeUtils.escapeHtml4(username) %></strong>!<br>You have been authenticated using JSP, Servlet, and JDBC.</p>
         <a href="logout">Logout</a>
     </main>
 </body>
