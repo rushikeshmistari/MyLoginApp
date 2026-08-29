@@ -19,9 +19,9 @@ import javax.servlet.http.HttpSession;
 public class LoginServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/login_db";
-    private static final String DB_USER = "root";
-    private static final String DB_PASSWORD = "your_mysql_password";
+    private static final String DB_URL = getEnvironment("DB_URL", "jdbc:mysql://localhost:3306/login_db");
+    private static final String DB_USER = getEnvironment("DB_USER", "root");
+    private static final String DB_PASSWORD = getEnvironment("DB_PASSWORD", "your_mysql_password");
     private static final String LOGIN_QUERY = "SELECT username FROM users WHERE username = ? AND password = ?";
 
     @Override
@@ -38,6 +38,11 @@ public class LoginServlet extends HttpServlet {
             RequestDispatcher dispatcher = request.getRequestDispatcher("error.jsp");
             dispatcher.forward(request, response);
         }
+    }
+
+    private static String getEnvironment(String key, String defaultValue) {
+        String value = System.getenv(key);
+        return value == null || value.trim().isEmpty() ? defaultValue : value;
     }
 
     private boolean isValidUser(String username, String password) {
