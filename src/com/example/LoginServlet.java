@@ -6,6 +6,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -50,6 +51,7 @@ public class LoginServlet extends HttpServlet {
             Class.forName("com.mysql.cj.jdbc.Driver");
             try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
                  PreparedStatement statement = connection.prepareStatement(LOGIN_QUERY)) {
+                createUsersTable(connection);
                 statement.setString(1, username);
                 statement.setString(2, password);
                 try (ResultSet result = statement.executeQuery()) {
@@ -59,6 +61,17 @@ public class LoginServlet extends HttpServlet {
         } catch (ClassNotFoundException | SQLException exception) {
             log("Database login error", exception);
             return false;
+        }
+    }
+
+    private void createUsersTable(Connection connection) throws SQLException {
+        String createTable = "CREATE TABLE IF NOT EXISTS users ("
+                + "id INT PRIMARY KEY AUTO_INCREMENT, "
+                + "username VARCHAR(50) NOT NULL UNIQUE, "
+                + "password VARCHAR(255) NOT NULL)";
+        try (Statement statement = connection.createStatement()) {
+            statement.executeUpdate(createTable);
+            statement.executeUpdate("INSERT IGNORE INTO users (username, password) VALUES ('student', 'java123')");
         }
     }
 }
