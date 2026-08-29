@@ -65,6 +65,10 @@ public class LoginServlet extends HttpServlet {
         return value.isEmpty() ? defaultValue : value;
     }
 
+    private static String getFirstEnvironment(String firstKey, String secondKey, String defaultValue) {
+        return getFirstEnvironment(firstKey, secondKey, "", defaultValue);
+    }
+
     private static String getEnvironment(String key) {
         String value = System.getenv(key);
         return value == null ? "" : value.trim();
