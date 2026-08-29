@@ -20,9 +20,9 @@ import javax.servlet.http.HttpSession;
 public class LoginServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
-    private static final String DB_URL = getEnvironment("DB_URL", "jdbc:mysql://localhost:3306/login_db");
-    private static final String DB_USER = getEnvironment("DB_USER", "root");
-    private static final String DB_PASSWORD = getEnvironment("DB_PASSWORD", "your_mysql_password");
+    private static final String DB_URL = getDatabaseUrl();
+    private static final String DB_USER = getFirstEnvironment("DB_USER", "MYSQLUSER", "MYSQL_USER", "root");
+    private static final String DB_PASSWORD = getFirstEnvironment("DB_PASSWORD", "MYSQLPASSWORD", "MYSQL_PASSWORD", "");
     private static final String LOGIN_QUERY = "SELECT username FROM users WHERE username = ? AND password = ?";
 
     @Override
@@ -41,9 +41,33 @@ public class LoginServlet extends HttpServlet {
         }
     }
 
-    private static String getEnvironment(String key, String defaultValue) {
+    private static String getDatabaseUrl() {
+        String url = getFirstEnvironment("DB_URL", "MYSQL_URL", "DATABASE_URL", "");
+        if (!url.isEmpty()) {
+            return url.startsWith("mysql://") ? "jdbc:" + url : url;
+        }
+
+        String host = getFirstEnvironment("MYSQLHOST", "MYSQL_HOST", "localhost");
+        String port = getFirstEnvironment("MYSQLPORT", "MYSQL_PORT", "3306");
+        String database = getFirstEnvironment("MYSQLDATABASE", "MYSQL_DATABASE", "login_db");
+        return "jdbc:mysql://" + host + ":" + port + "/" + database
+                + "?useSSL=true&requireSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+    }
+
+    private static String getFirstEnvironment(String firstKey, String secondKey, String thirdKey, String defaultValue) {
+        String value = getEnvironment(firstKey);
+        if (value.isEmpty()) {
+            value = getEnvironment(secondKey);
+        }
+        if (value.isEmpty()) {
+            value = getEnvironment(thirdKey);
+        }
+        return value.isEmpty() ? defaultValue : value;
+    }
+
+    private static String getEnvironment(String key) {
         String value = System.getenv(key);
-        return value == null || value.trim().isEmpty() ? defaultValue : value;
+        return value == null ? "" : value.trim();
     }
 
     private boolean isValidUser(String username, String password) {
