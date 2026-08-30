@@ -8,4 +8,4 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 INSERT INTO users (username, password)
-VALUES ('student', 'java123');
+VALUES ('student','java123');
